@@ -6,7 +6,6 @@ export const ImageProvider = ({ children }) => {
     const [images, setImages] = useState({
         'Company Logo': null,
         'Profile Picture': null,
-        'Cover Photo': null,
     });
 
     const updateImage = (name, data) => {

@@ -7,7 +7,7 @@ const Images = () => {
     const [modalName, setModalName] = useState('')
     const { images } = useContext(ImageContext);
 
-    const cardNames = ['Company Logo', 'Profile Picture', 'Cover Photo']
+    const cardNames = ['Profile Picture', 'Cover Photo']
 
     const openModal = (name) => {
         setModalName(name)
@@ -20,10 +20,7 @@ const Images = () => {
 
     return (
         <div className="mt-10">
-            <div className="flex items-center space-x-4">
-                <h2 className="text-gray-700 text-2xl font-bold">Add images</h2>
-                <button className="bg-white text-gray-300 px-4 py-2 shadow-lg rounded-lg">Change Layout</button>
-            </div>
+            <h2 className="text-gray-700 text-2xl font-bold">Add images</h2>
             <div className="flex items-center space-x-4 mt-4">
                 {cardNames.map((name, index) => (
                     <div
