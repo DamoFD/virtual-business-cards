@@ -3,7 +3,7 @@ import Editor from './editor/Editor'
 function App() {
 
   return (
-    <div className="min-h-screen w-full flex bg-gray-100">
+    <div className="min-h-screen w-full flex bg-gray-100 relative">
         <div className="w-2/5 bg-red-200">
             <h1 className="text-red-500">Test</h1>
         </div>
