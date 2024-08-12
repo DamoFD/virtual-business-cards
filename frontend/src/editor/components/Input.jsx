@@ -1,6 +1,6 @@
 const Input = ({label, value, onChange}) => {
     return (
-        <div className="relative m-2 max-w-[fit-content] group">
+        <div className="relative m-2 max-w-full group">
             <input type="text" value={value} onChange={onChange} className="outline-none px-3 py-3 peer" placeholder=" "/>
 
             <label

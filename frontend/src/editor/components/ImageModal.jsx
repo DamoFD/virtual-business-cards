@@ -3,7 +3,7 @@ import { CardContext } from '../../context/CardContext'
 
 const ImageModal = ({isOpen, closeModal, modalName}) => {
     const [visible, setVisible] = useState(false)
-    const { updateImage, card } = useContext(CardContext)
+    const { updateField, card } = useContext(CardContext)
 
     useEffect(() => {
         if (isOpen) {
@@ -16,14 +16,14 @@ const ImageModal = ({isOpen, closeModal, modalName}) => {
         if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                updateImage(modalName, reader.result);
+                updateField(modalName, reader.result);
             };
             reader.readAsDataURL(file);
         }
     }
 
     const handleImageDelete = () => {
-        updateImage(modalName, null)
+        updateField(modalName, null)
     }
 
     return (

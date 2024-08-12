@@ -1,49 +1,51 @@
 import { createContext, useState } from 'react'
+import jsonData from '../../optionData.json'
 
 export const CardContext = createContext();
 
 export const CardProvider = ({ children }) => {
-    const [card, setCard] = useState({
-        images: {
-            'Company Logo': null,
-            'Profile Picture': null,
-        },
-        name: {
-            'First Name': null,
-            'Last Name': null,
-        },
-        jobTitle: '',
-    });
 
-    const updateImage = (imageName, imageData) => {
-        setCard(prevCard => ({
-            ...prevCard,
+    const initializeCardState = () => {
+        const initialState = {
             images: {
-                ...prevCard.images,
-                [imageName]: imageData,
+                'Cover Photo': null,
+                'Profile Picture': null,
             }
-        }));
-    };
+        };
 
-    const updateName = (nameType, nameData) => {
-        setCard(prevCard => ({
-            ...prevCard,
-            name: {
-                ...prevCard.name,
-                [nameType]: nameData,
-            }
-        }));
+        Object.keys(jsonData).forEach(category => {
+            jsonData[category].forEach(item => {
+                // If the item has multiple fields, create an object for those fields
+                initialState[item.name] = {};
+                item.fields.forEach(field => {
+                    initialState[item.name][field] = null;
+                });
+            });
+        });
+        return initialState;
     }
 
-    const updateJobTitle = (newJobTitle) => {
-        setCard(prevCard => ({
-            ...prevCard,
-            jobTitle: newJobTitle
-        }));
+    const [card, setCard] = useState(initializeCardState);
+
+    const updateField = (fieldName, value) => {
+        setCard(prevCard => {
+            for (let key in prevCard) {
+                if (typeof prevCard[key] === 'object' && fieldName in prevCard[key]) {
+                    return {
+                        ...prevCard,
+                        [key]: {
+                            ...prevCard[key],
+                            [fieldName]: value,
+                        }
+                    }
+                }
+            }
+            return prevCard
+        })
     }
 
     return (
-        <CardContext.Provider value={{ card, updateImage, updateName, updateJobTitle }}>
+        <CardContext.Provider value={{ card, updateField, jsonData }}>
             {children}
         </CardContext.Provider>
     );

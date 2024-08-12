@@ -5,9 +5,13 @@ import options from '../../../optionData.json'
 
 const Details = () => {
     const [modalName, setModalName] = useState('')
+    const [fields, setFields] = useState([])
+    const [suggestions, setSuggestions] = useState([])
     const [isOpen, setIsOpen] = useState(false)
 
-    const openModal = (name) => {
+    const openModal = (name, fields, suggestions) => {
+        setFields(fields)
+        setSuggestions(suggestions)
         setModalName(name)
         setIsOpen(true)
     }
@@ -26,14 +30,14 @@ const Details = () => {
                             <p className="font-semibold">{category.charAt(0).toUpperCase() + category.slice(1)}</p>
                             <div className="flex items-center mt-2 flex-wrap gap-4">
                                 {options[category].map((item, idx) => (
-                                    <OptionCard openModal={openModal} key={idx} name={item.name} icon={item.icon} />
+                                    <OptionCard openModal={openModal} key={idx} name={item.name} fields={item.fields} suggestions={item.suggestions} icon={item.icon} />
                                 ))}
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
-            {isOpen && <InputModal closeModal={closeModal} modalName={modalName} isOpen={isOpen} />}
+            {isOpen && <InputModal closeModal={closeModal} modalName={modalName} isOpen={isOpen} fields={fields} suggestions={suggestions} />}
         </div>
     )
 }
