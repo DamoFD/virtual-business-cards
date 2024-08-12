@@ -16,14 +16,14 @@ const ImageModal = ({isOpen, closeModal, modalName}) => {
         if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                updateField(modalName, reader.result);
+                updateField('images', modalName, reader.result);
             };
             reader.readAsDataURL(file);
         }
     }
 
     const handleImageDelete = () => {
-        updateField(modalName, null)
+        updateField('images', modalName, null)
     }
 
     return (

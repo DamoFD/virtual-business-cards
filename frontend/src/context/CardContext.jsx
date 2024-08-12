@@ -27,20 +27,22 @@ export const CardProvider = ({ children }) => {
 
     const [card, setCard] = useState(initializeCardState);
 
-    const updateField = (fieldName, value) => {
+    const updateField = (name, fieldName, value) => {
         setCard(prevCard => {
-            for (let key in prevCard) {
-                if (typeof prevCard[key] === 'object' && fieldName in prevCard[key]) {
+                if (prevCard[name]) {
                     return {
                         ...prevCard,
-                        [key]: {
-                            ...prevCard[key],
+                        [name]: {
+                            ...prevCard[name],
                             [fieldName]: value,
                         }
                     }
-                }
+                } else {
+                    return {
+                    ...prevCard,
+                    [name]: value,
+                };
             }
-            return prevCard
         })
     }
 

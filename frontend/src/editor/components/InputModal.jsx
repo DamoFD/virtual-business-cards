@@ -7,13 +7,14 @@ const InputModal = ({isOpen, closeModal, modalName, fields, suggestions}) => {
     const { updateField, card } = useContext(CardContext)
 
     const handleInputChange = (field) => (e) => {
+        console.log(field)
         const value = e.target.value;
-        updateField(field, value);
+        updateField(modalName, field, value);
     }
 
     const handleDeleteField = () => {
         fields.forEach(field => {
-            updateField(field, null);
+            updateField(modalName, field, null);
         })
     }
 
@@ -26,25 +27,31 @@ const InputModal = ({isOpen, closeModal, modalName, fields, suggestions}) => {
     return (
         <div className="fixed w-full h-full z-10 top-0 left-0 flex justify-center items-center backdrop-blur-sm">
             <div onClick={closeModal} className="absolute top-0 left-0 w-full h-full z-10 bg-black opacity-60 justify-center items-center" />
-            <div className={`relative bg-white z-[11] w-1/2 p-10 rounded-lg shadow-lg transition-transform duration-200 ${visible ? 'scale-100' : 'scale-0'}`}>
+            <div className={`relative bg-white z-[11] w-1/3 p-10 rounded-lg shadow-lg transition-transform duration-200 ${visible ? 'scale-100' : 'scale-0'}`}>
                 <p className="cursor-pointer absolute top-4 right-4" onClick={closeModal}>X</p>
                     <p className="font-bold text-lg text-gray-700">{'Enter Your ' + modalName}</p>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col">
                         {fields.map((field, idx) => (
                             <div key={idx}>
                                 <Input
                                     label={field}
-                                    value={card[modalName][field]}
+                                    value={card[modalName][field] || ''}
                                     onChange={handleInputChange(field)}
                                 />
                             </div>
                         ))}
                         {suggestions && (
-                            <div>
-                                <p>Here are some suggestions for your {fields[1]}</p>
-                                {suggestions.map((suggestion, i) => (
-                                    <p key={i}>{suggestion}</p>
-                                ))}
+                            <div className="mt-2">
+                                <p className="text-sm text-gray-500">Here are some suggestions for your {fields[1]}</p>
+                                <div className="flex space-x-4 mt-2">
+                                    {suggestions.map((suggestion, i) => (
+                                        <p
+                                            className="text-sm text-gray-500 border border-gray-500 rounded-full px-2 py-1 hover:bg-gray-200 hover:-translate-y-px transition-all duration-200 cursor-pointer"
+                                            key={i}
+                                            onClick={() => handleInputChange(fields[1])({ target: { value: suggestion } })}
+                                        >{suggestion}</p>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
