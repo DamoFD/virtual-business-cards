@@ -7,7 +7,6 @@ const InputModal = ({isOpen, closeModal, modalName, fields, suggestions}) => {
     const { updateField, card } = useContext(CardContext)
 
     const handleInputChange = (field) => (e) => {
-        console.log(field)
         const value = e.target.value;
         updateField(modalName, field, value);
     }
@@ -40,13 +39,13 @@ const InputModal = ({isOpen, closeModal, modalName, fields, suggestions}) => {
                                 />
                             </div>
                         ))}
-                        {suggestions && (
+                        {(suggestions && suggestions.length > 0) && (
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">Here are some suggestions for your {fields[1]}</p>
                                 <div className="flex space-x-4 mt-2">
                                     {suggestions.map((suggestion, i) => (
                                         <p
-                                            className="text-sm text-gray-500 border border-gray-500 rounded-full px-2 py-1 hover:bg-gray-200 hover:-translate-y-px transition-all duration-200 cursor-pointer"
+                                            className="text-sm text-center text-gray-500 border border-gray-500 rounded-full px-2 py-1 hover:bg-gray-200 hover:-translate-y-px transition-all duration-200 cursor-pointer"
                                             key={i}
                                             onClick={() => handleInputChange(fields[1])({ target: { value: suggestion } })}
                                         >{suggestion}</p>

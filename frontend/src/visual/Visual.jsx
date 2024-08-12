@@ -41,6 +41,9 @@ const Visual = () => {
                 </div>
             </div>
             <PersonalVisual />
+            {/*
+            <GeneralVisual />
+                    */}
             {isOpen && <ImageModal modalName={modalName} isOpen={isOpen} closeModal={closeModal} />}
         </div>
     )

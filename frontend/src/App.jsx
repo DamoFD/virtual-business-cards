@@ -7,7 +7,7 @@ function App() {
   return (
     <CardProvider>
         <div className="h-screen w-full flex bg-gray-100 relative">
-            <div className="w-1/3 bg-red-200 flex items-center justify-center">
+            <div className="w-1/3 bg-red-200 flex items-center justify-center overflow-y-auto">
                 <Visual />
             </div>
             <div className="w-2/3 h-full p-14 overflow-y-auto">
