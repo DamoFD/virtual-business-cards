@@ -4,14 +4,15 @@ export const CardContext = createContext();
 
 export const CardProvider = ({ children }) => {
     const [card, setCard] = useState({
-        name: {
-            'First Name': null,
-            'Last Name': null,
-        },
         images: {
             'Company Logo': null,
             'Profile Picture': null,
         },
+        name: {
+            'First Name': null,
+            'Last Name': null,
+        },
+        jobTitle: '',
     });
 
     const updateImage = (imageName, imageData) => {
@@ -34,8 +35,15 @@ export const CardProvider = ({ children }) => {
         }));
     }
 
+    const updateJobTitle = (newJobTitle) => {
+        setCard(prevCard => ({
+            ...prevCard,
+            jobTitle: newJobTitle
+        }));
+    }
+
     return (
-        <CardContext.Provider value={{ card, updateImage, updateName }}>
+        <CardContext.Provider value={{ card, updateImage, updateName, updateJobTitle }}>
             {children}
         </CardContext.Provider>
     );
