@@ -7,7 +7,7 @@ const LabelCard = ({data, openModal, name}) => {
     return (
         <div onClick={() => openModal(name)} className="p-2 group hover:bg-gray-100 rounded-lg cursor-pointer transition-color duration-200 flex justify-between items-center">
             <div className="flex space-x-2 items-center">
-                <div className="flex items-center justify-center bg-red-400 size-10 rounded-full">
+                <div className="flex items-center justify-center bg-red-400 size-10 rounded-full shadow-lg">
                     {Icon && <Icon className="text-white size-6" />}
                 </div>
                 <div>

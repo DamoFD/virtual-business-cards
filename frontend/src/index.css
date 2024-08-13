@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.inner-shadow {
+    box-shadow: inset 0px 34px 34px rgba(0, 0, 0, 0.12);
+}
+
+@font-face {
+    font-family: 'inter';
+    src: url('./assets/Inter-VariableFont_slnt,wght.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'hanken';
+    src: url('./assets/HankenGrotesk-VariableFont_wght.ttf');
+    font-display: swap;
+}
+
+.card-shadow {
+    box-shadow: 2px 8px 5px rgba(0, 0, 0, 0.12);
+}
+
+.card-depth {
+    border: 2px solid #1F1F1F;
+    border-radius: 10px;
+    box-shadow: 5px 6px 0px #1F1F1F;
+    transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+.card-depth:hover {
+    box-shadow: 0px 0px 0px #1F1F1F;
+    transform: translateY(5px);
+}

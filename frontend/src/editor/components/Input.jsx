@@ -1,6 +1,6 @@
 const Input = ({label, value, onChange}) => {
     return (
-        <div className="relative mt-4 max-w-full group">
+        <div className="relative mt-4 max-w-full group font-hasken">
             <input type="text" value={value} onChange={onChange} className="outline-none px-3 py-3 peer" placeholder=" "/>
 
             <label
@@ -20,7 +20,7 @@ const Input = ({label, value, onChange}) => {
                     peer-placeholder-shown:text-xl
                     group-focus-within:!top-px
                     group-focus-within:!text-sm
-                    group-focus-within:!text-red-400"
+                    group-focus-within:!text-green-600"
             >{label}</label>
 
             <fieldset
@@ -34,7 +34,7 @@ const Input = ({label, value, onChange}) => {
                     mt-[-9px]
                     invisible
                     peer-placeholder-shown:visible
-                    group-focus-within:!border-red-400
+                    group-focus-within:!border-green-600
                     group-focus-within:border-2
                     group-hover:border-gray-700"
             >
@@ -65,7 +65,7 @@ const Input = ({label, value, onChange}) => {
                     visible
                     peer-placeholder-shown:invisible
                     group-focus-within:border-2
-                    group-focus-within:!border-red-400
+                    group-focus-within:!border-green-600
                     group-hover:border-gray-700"
             >
                 <legend className="ml-2 text-sm invisible px-1 max-w-full whitespace-nowrap">{label}</legend>
