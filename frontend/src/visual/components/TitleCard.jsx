@@ -5,14 +5,14 @@ const TitleCard = ({data, openModal, name}) => {
     const Icon = getIcon(name)
 
     return (
-        <div onClick={() => openModal(name)} className="p-2 group hover:bg-gray-100 rounded-lg cursor-pointer transition-color duration-200 flex justify-between items-center">
+        <div onClick={() => openModal(name)} className="p-2 group hover:bg-gray-200 rounded-lg cursor-pointer transition-color duration-200 flex justify-between items-center">
             <div className="flex space-x-2 items-center">
-                <div className="flex items-center justify-center bg-red-400 size-10 rounded-full shadow-lg">
-                    {Icon && <Icon className="text-white size-6" />}
+                <div className="flex items-center justify-center bg-gradient-to-br from-wc-green to-wc-blue size-10 rounded-full card-shadow">
+                    {Icon && <Icon className="text-brand-black size-6" />}
                 </div>
                 <div>
                     {data[keys[1]] && (
-                        <p className="text-gray-700 font-semibold">{data[keys[1]]}</p>
+                        <p className="text-gray-700 font-semibold font-hanken">{data[keys[1]]}</p>
                     )}
                 </div>
             </div>

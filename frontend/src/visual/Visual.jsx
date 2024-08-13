@@ -18,7 +18,7 @@ const Visual = () => {
     }
 
     return (
-        <div className="bg-white rounded-lg card-shadow w-3/4 overflow-hidden pb-8">
+        <div className="bg-brand-background rounded-lg card-shadow w-3/4 overflow-hidden pb-8">
             {(card.images['Cover Photo'] || card.images['Profile Picture']) && (
                 <div className="max-h-56 w-full relative cursor-pointer overflow-hidden group">
                     <img className="object-cover w-full max-h-56 group-hover:scale-105 transition-transform duration-200" src={card.images['Cover Photo'] ? card.images['Cover Photo'] : card.images['Profile Picture']} />
@@ -34,7 +34,7 @@ const Visual = () => {
             )}
             {(card.images['Cover Photo'] && card.images['Profile Picture']) && (
                 <div
-                    className="size-32 p-2 bg-white rounded-full -mt-16 z-[3] relative ml-4 group cursor-pointer"
+                    className="size-32 p-2 bg-brand-background rounded-full -mt-16 z-[3] relative ml-4 group cursor-pointer"
                     onClick={() => openModal('Profile Picture')}
                 >
                     <div className="z-[4] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black opacity-0 group-hover:opacity-50 rounded-full size-10 transition-opacity duration-200" />
