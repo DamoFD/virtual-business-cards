@@ -63,11 +63,11 @@ const PersonalVisual = () => {
 
                     if (fields.includes('Label') && fieldData[fields[0]] !== null) {
                         return (
-                            <LabelCard key={key} data={fieldData} openModal={openModal} />
+                            <LabelCard name={key} key={key} data={fieldData} openModal={openModal} />
                         )
                     } else if (fields.includes('Title') && fieldData[fields[0]] !== null) {
                         return (
-                            <TitleCard key={key} data={fieldData} openModal={openModal} />
+                            <TitleCard name={key} key={key} data={fieldData} openModal={openModal} />
                         )
                     }
                 }
