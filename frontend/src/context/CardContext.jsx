@@ -10,6 +10,9 @@ export const CardProvider = ({ children }) => {
             images: {
                 'Cover Photo': null,
                 'Profile Picture': null,
+            },
+            colors: {
+                'Colors': 0,
             }
         };
 

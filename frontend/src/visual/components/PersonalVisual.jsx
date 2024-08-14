@@ -1,8 +1,9 @@
-import { useContext, useState, useRef, useEffect } from 'react'
+import { useContext, useState } from 'react'
 import { CardContext } from '../../context/CardContext'
 import InputModal from '../../editor/components/InputModal'
 import TitleCard from './TitleCard'
 import LabelCard from './LabelCard'
+import GetColors from '../../colors/GetColors'
 
 const PersonalVisual = () => {
     const { card, jsonData } = useContext(CardContext);
@@ -28,6 +29,8 @@ const PersonalVisual = () => {
     const closeModal = () => {
         setIsOpen(false)
     }
+
+    const colors = GetColors(card.colors['Colors']);
 
     return (
         <div className="mx-4 mt-2">
@@ -63,11 +66,11 @@ const PersonalVisual = () => {
 
                     if (fields.includes('Label') && fieldData[fields[0]] !== null) {
                         return (
-                            <LabelCard name={key} key={key} data={fieldData} openModal={openModal} />
+                            <LabelCard colors={colors} name={key} key={key} data={fieldData} openModal={openModal} />
                         )
                     } else if (fields.includes('Title') && fieldData[fields[0]] !== null) {
                         return (
-                            <TitleCard name={key} key={key} data={fieldData} openModal={openModal} />
+                            <TitleCard colors={colors} name={key} key={key} data={fieldData} openModal={openModal} />
                         )
                     }
                 }

@@ -1,13 +1,19 @@
 import getIcon from '../../icons/GetIcon'
 
-const TitleCard = ({data, openModal, name}) => {
+const TitleCard = ({data, openModal, name, colors}) => {
     const keys = Object.keys(data)
     const Icon = getIcon(name)
 
     return (
         <div onClick={() => openModal(name)} className="p-2 group hover:bg-gray-200 rounded-lg cursor-pointer transition-color duration-200 flex justify-between items-center">
             <div className="flex space-x-2 items-center">
-                <div className="flex items-center justify-center bg-gradient-to-br from-wc-green to-wc-blue size-10 rounded-full card-shadow">
+                <div
+                    className="flex items-center justify-center gradient-background size-10 rounded-full card-shadow"
+                    style={{
+                        '--from-color': colors[0],
+                        '--to-color': colors[1],
+                    }}
+                >
                     {Icon && <Icon className="text-brand-black size-6" />}
                 </div>
                 <div>

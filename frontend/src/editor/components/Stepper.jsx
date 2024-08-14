@@ -1,9 +1,16 @@
-const Stepper = () => {
+const Stepper = ({ colors }) => {
+
     return (
         <div className="flex items-center justify-between w-full mx-auto text-gray-800">
 
             <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="bg-gradient-to-br from-wc-green to-wc-blue rounded-full size-12 text-brand-black flex items-center justify-center card-shadow">
+                <div
+                    className="gradient-background rounded-full size-12 text-brand-black flex items-center justify-center card-shadow"
+                    style={{
+                        '--from-color': colors[0],
+                        '--to-color': colors[1],
+                    }}
+                >
                     <p className="text-lg font-bold font-inter">1</p>
                 </div>
                 <p className="text-sm font-hanken text-brand-black">Customize your card</p>
@@ -22,7 +29,13 @@ const Stepper = () => {
 
 
             <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="bg-gradient-to-br from-wc-green to-wc-blue rounded-full size-12 text-brand-black flex items-center justify-center card-shadow">
+                <div
+                    className="gradient-background rounded-full size-12 text-brand-black flex items-center justify-center card-shadow"
+                    style={{
+                        '--from-color': colors[0],
+                        '--to-color': colors[1],
+                    }}
+                >
                     <p className="text-lg font-bold font-inter">2</p>
                 </div>
                 <p className="text-sm font-hanken text-brand-black">Create an account</p>
@@ -41,7 +54,13 @@ const Stepper = () => {
 
 
             <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="bg-gradient-to-br from-wc-green to-wc-blue rounded-full size-12 text-brand-black flex items-center justify-center card-shadow">
+                <div
+                    className="gradient-background rounded-full size-12 text-brand-black flex items-center justify-center card-shadow"
+                    style={{
+                        '--from-color': colors[0],
+                        '--to-color': colors[1],
+                    }}
+                >
                     <p className="text-lg font-bold font-inter">3</p>
                 </div>
                 <p className="text-sm font-hanken text-brand-black">Get your card</p>
