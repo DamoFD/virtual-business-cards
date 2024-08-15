@@ -30,6 +30,12 @@ const InputModal = ({isOpen, closeModal, modalName, fields, suggestions}) => {
         }, 200)
     }
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleCloseModal()
+        }
+    }
+
     return (
         <div className="fixed w-full h-full z-10 top-0 left-0 flex justify-center items-center backdrop-blur-sm">
             <div onClick={handleCloseModal} className="absolute top-0 left-0 w-full h-full z-10 bg-black opacity-60 justify-center items-center" />
@@ -43,6 +49,8 @@ const InputModal = ({isOpen, closeModal, modalName, fields, suggestions}) => {
                                     label={field}
                                     value={card[modalName][field] || ''}
                                     onChange={handleInputChange(field)}
+                                    autoFocus={idx === 0}
+                                    handleKeyDown={handleKeyDown}
                                 />
                             </div>
                         ))}

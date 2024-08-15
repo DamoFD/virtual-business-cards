@@ -1,7 +1,15 @@
-const Input = ({label, value, onChange}) => {
+const Input = ({label, value, onChange, autoFocus, handleKeyDown}) => {
     return (
         <div className="relative mt-4 max-w-full group font-hasken">
-            <input type="text" value={value} onChange={onChange} className="outline-none px-3 py-3 peer" placeholder=" "/>
+            <input
+                type="text"
+                value={value}
+                onChange={onChange}
+                autoFocus={autoFocus}
+                className="outline-none px-3 py-3 peer w-full"
+                onKeyDown={handleKeyDown}
+                placeholder=" "
+            />
 
             <label
                 className="

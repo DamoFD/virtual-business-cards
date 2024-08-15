@@ -15,7 +15,7 @@ const Register = () => {
             <p className="text-brand-black font-hanken text-lg">Time to bring your card to life! Create an account to save your changes and share it with others.</p>
 
             <div>
-                <Input label="Email" value="" onChange="" />
+                <Input label="Email" value="" onChange="" autoFocus={true} />
                 <Input label="Password" value="" onChange="" />
                 <button
                     className="card-depth px-4 py-2 font-hanken"
