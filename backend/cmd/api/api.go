@@ -17,6 +17,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
+    "github.com/DamoFD/virtual-business/service/user"
 )
 
 // APIServer contains servers configurations.
@@ -40,7 +42,11 @@ func NewAPIServer(addr string, db *sql.DB) *APIServer {
 // It returns nil if the server starts successfully.
 func (s *APIServer) Run() error {
 	router := mux.NewRouter()
-	// subrouter := router.PathPrefix("/api/v1").Subrouter()
+	subrouter := router.PathPrefix("/api/v1").Subrouter()
+
+    userStore := user.NewStore(s.db)
+    userHandler := user.NewHandler(userStore)
+    userHandler.RegisterRoutes(subrouter)
 
 	log.Println("Listening on", s.addr)
 
