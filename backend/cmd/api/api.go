@@ -18,7 +18,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-    "github.com/DamoFD/virtual-business/service/user"
+	"github.com/DamoFD/virtual-business/service/user"
 )
 
 // APIServer contains servers configurations.
@@ -44,9 +44,10 @@ func (s *APIServer) Run() error {
 	router := mux.NewRouter()
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
-    userStore := user.NewStore(s.db)
-    userHandler := user.NewHandler(userStore)
-    userHandler.RegisterRoutes(subrouter)
+	// Register user routes
+	userStore := user.NewStore(s.db)
+	userHandler := user.NewHandler(userStore)
+	userHandler.RegisterRoutes(subrouter)
 
 	log.Println("Listening on", s.addr)
 
