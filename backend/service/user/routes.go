@@ -45,30 +45,37 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 
 // handleLogin handles the login route.
 // It takes a http.ResponseWriter and a *http.Request as parameters.
+// It returns an error if the login fails.
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	var payload types.LoginUserPayload
+
+    // Parse the request body into the LoginUserPayload struct
 	if err := utils.ParseJSON(r, &payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
+    // Validate the LoginUserPayload struct
 	if err := utils.Validate.Struct(payload); err != nil {
 		errors := err.(validator.ValidationErrors)
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
 		return
 	}
 
+    // Check if the user exists by email
 	u, err := h.store.GetUserByEmail(payload.Email)
 	if err != nil {
 		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid credentials"))
 		return
 	}
 
+    // Compare the plain password with the hashed password
 	if !auth.ComparePassword(u.Password, []byte(payload.Password)) {
 		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid credentials"))
 		return
 	}
 
+    // Create a JWT token
 	secret := []byte(config.Envs.JWTSecret)
 	token, err := auth.CreateJWT(secret, u.ID)
 	if err != nil {
@@ -76,6 +83,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+    // Return the JWT token
 	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
