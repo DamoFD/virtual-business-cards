@@ -7,10 +7,14 @@ It contains a method handleRegister() that handles the register route.
 package user
 
 import (
+	"fmt"
 	"net/http"
 
+	validator "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
+	"github.com/DamoFD/virtual-business/config"
+	"github.com/DamoFD/virtual-business/service/auth"
 	"github.com/DamoFD/virtual-business/types"
 	"github.com/DamoFD/virtual-business/utils"
 )
@@ -47,6 +51,32 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	u, err := h.store.GetUserByEmail(payload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid credentials"))
+		return
+	}
+
+	if !auth.ComparePassword(u.Password, []byte(payload.Password)) {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid credentials"))
+		return
+	}
+
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT(secret, u.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
 // handleRegister handles the register route.

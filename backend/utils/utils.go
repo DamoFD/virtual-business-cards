@@ -10,7 +10,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
+
+// Validate is a validator instance
+var Validate = validator.New()
 
 // ParseJSON parses a JSON request body into a struct
 // It takes a *http.Request and a pointer to a struct as arguments.
