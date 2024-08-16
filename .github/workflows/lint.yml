@@ -22,9 +22,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
+
+      - name: Change directory to backend
+        run: cd backend
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59
-        env:
-          GITHUB_WORKSPACE: ${{ github.workspace }}/backend
