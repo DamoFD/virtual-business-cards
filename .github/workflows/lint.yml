@@ -26,3 +26,5 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}/backend
