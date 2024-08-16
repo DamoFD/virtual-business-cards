@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/DamoFD/virtual-business/types"
 )
@@ -25,7 +26,43 @@ func NewStore(db *sql.DB) *Store {
 // It takes an email string as a parameter.
 // It returns a pointer to the User struct and an error.
 func (s *Store) GetUserByEmail(email string) (*types.User, error) {
-	return nil, nil
+	rows, err := s.db.Query("SELECT * FROM users WHERE email = $1", email)
+	if err != nil {
+		return nil, err
+	}
+
+	u := new(types.User)
+	for rows.Next() {
+		u, err = scanRowIntoUser(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if u.ID == 0 {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return u, nil
+}
+
+// scanRowIntoUser scans a row from the database and returns a pointer to the User struct.
+// It returns an error if the scan fails.
+// It returns a pointer to the User struct and an error.
+func scanRowIntoUser(row *sql.Rows) (*types.User, error) {
+	u := new(types.User)
+	err := row.Scan(
+		&u.ID,
+		&u.Name,
+		&u.Email,
+		&u.Password,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 // GetUserByID pulls a user from the database by ID.

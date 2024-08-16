@@ -22,3 +22,10 @@ var ComparePassword = func(hash string, plain []byte) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), plain)
 	return err == nil
 }
+
+// ConfirmPassword checks if two passwords match
+// It takes a password string and a confirm password string as parameters.
+// It returns true if the passwords match, false otherwise.
+func ConfirmPassword(password string, confirmPassword string) bool {
+    return password == confirmPassword
+}
