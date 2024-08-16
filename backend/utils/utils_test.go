@@ -6,6 +6,8 @@ import (
     "bytes"
     "encoding/json"
     "net/http/httptest"
+    "fmt"
+    "errors"
 )
 
 func TestParseJSON(t *testing.T) {
@@ -113,6 +115,62 @@ func TestWriteJSON(t *testing.T) {
         if contentType := rr.Header().Get("Content-Type"); contentType != "application/json" {
             t.Errorf("handler returned unexpected content type: got %v want %v",
                 contentType, "application/json")
+        }
+    })
+}
+
+func TestWriteError(t *testing.T) {
+    t.Run("valid error", func(t *testing.T) {
+
+        // Arrange
+        err := fmt.Errorf("test error")
+        rr := httptest.NewRecorder()
+
+        // Act
+        WriteError(rr, http.StatusBadRequest, err)
+
+        // Assert
+        if status := rr.Code; status != http.StatusBadRequest {
+            t.Errorf("handler returned wrong status code: got %v want %v",
+                status, http.StatusBadRequest)
+        }
+
+        if contentType := rr.Header().Get("Content-Type"); contentType != "application/json" {
+            t.Errorf("handler returned unexpected content type: got %v want %v",
+                contentType, "application/json")
+        }
+
+        expectedBody := `{"error":"test error"}` + "\n"
+        if rr.Body.String() != expectedBody {
+            t.Errorf("handler returned unexpected body: got %v want %v",
+                rr.Body.String(), expectedBody)
+        }
+    })
+
+    t.Run("write error with empty error message", func(t *testing.T) {
+
+        // Arrange
+        err := errors.New("")
+        rr := httptest.NewRecorder()
+
+        // Act
+        WriteError(rr, http.StatusBadRequest, err)
+
+        // Assert
+        if status := rr.Code; status != http.StatusBadRequest {
+            t.Errorf("handler returned wrong status code: got %v want %v",
+                status, http.StatusBadRequest)
+        }
+
+        if contentType := rr.Header().Get("Content-Type"); contentType != "application/json" {
+            t.Errorf("handler returned unexpected content type: got %v want %v",
+                contentType, "application/json")
+        }
+
+        expectedBody := `{"error":""}` + "\n"
+        if rr.Body.String() != expectedBody {
+            t.Errorf("handler returned unexpected body: got %v want %v",
+                rr.Body.String(), expectedBody)
         }
     })
 }
