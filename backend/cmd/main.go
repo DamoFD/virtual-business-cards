@@ -6,6 +6,7 @@ import (
 
     "github.com/DamoFD/virtual-business/db"
     "github.com/DamoFD/virtual-business/config"
+    "github.com/DamoFD/virtual-business/cmd/api"
 )
 
 func main() {
@@ -21,6 +22,11 @@ func main() {
     }
 
     initStorage(db)
+
+    server := api.NewAPIServer(":8080", db)
+    if err := server.Run(); err != nil {
+        log.Fatal(err)
+    }
 }
 
 func initStorage(db *sql.DB) {
