@@ -1,0 +1,45 @@
+services:
+  cardapp:
+    container_name: cardapp
+    image: cardapp:latest
+    build:
+      context: ./backend
+      dockerfile: go.Dockerfile
+    environment:
+      DATABASE_URL: 'postgres://postgres:postgres@db:5432/cardapp?sslmode=disable'
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+
+  cardapp-frontend:
+    container_name: cardapp-frontend
+    image: cardapp-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: js.Dockerfile
+    ports:
+      - 80:5173
+
+  db:
+    container_name: cardapp-db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'cardapp'
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    ports:
+      - 8081:8080
+    depends_on:
+      - db
+
+volumes:
+  pgdata: {}
