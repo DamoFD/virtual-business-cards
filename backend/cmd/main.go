@@ -1,3 +1,7 @@
+/*
+    Package main contains main function.
+    It contains a function main that starts the API server and initializes the storage.
+*/
 package main
 
 import (
@@ -9,6 +13,9 @@ import (
     "github.com/DamoFD/virtual-business/cmd/api"
 )
 
+// main starts the API server and initializes the storage.
+// It returns an error if the server fails to start or the storage fails to initialize.
+// It returns nil if the server and the storage start successfully.
 func main() {
     db, err := db.NewPostgreSQLStorage(db.PostgresConfig{
         Host: config.Envs.DBHost,
@@ -29,6 +36,9 @@ func main() {
     }
 }
 
+// initStorage initializes the storage.
+// It takes a database connection as an argument.
+// It returns an error if the storage fails to initialize.
 func initStorage(db *sql.DB) {
     err := db.Ping()
     if err != nil {
