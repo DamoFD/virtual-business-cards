@@ -1,6 +1,6 @@
 /*
-    Package db contains database configurations and methods.
-    It contains a struct PostgresConfig and a method NewPostgreSQLStorage() that initializes the database.
+Package db contains database configurations and methods.
+It contains a struct PostgresConfig and a method NewPostgreSQLStorage() that initializes the database.
 */
 package db
 

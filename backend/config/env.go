@@ -1,6 +1,6 @@
 /*
-    Package config contains configurations for the API server.
-    It contains a struct Config and a method initConfig() that initializes the configurations.
+Package config contains configurations for the API server.
+It contains a struct Config and a method initConfig() that initializes the configurations.
 */
 package config
 
