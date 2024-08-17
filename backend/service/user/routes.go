@@ -29,7 +29,7 @@ type Handler struct {
 }
 
 // NewHandler creates a new user handler.
-// It takes a user store as a parameter.
+// It takes a user store and an auth service as parameters.
 // It returns a pointer to the Handler struct.
 func NewHandler(store types.UserStore, auth types.Auth) *Handler {
 	return &Handler{
@@ -39,7 +39,7 @@ func NewHandler(store types.UserStore, auth types.Auth) *Handler {
 }
 
 // RegisterRoutes registers the user routes and methods.
-// It takes a router as a parameter.
+// It takes a router and a middleware as parameters.
 func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware) {
 	router.Handle("/login", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogin))).Methods("POST")
 	router.Handle("/register", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleRegister))).Methods("POST")

@@ -69,12 +69,34 @@ func scanRowIntoUser(row *sql.Rows) (*types.User, error) {
 // It takes an ID string as a parameter.
 // It returns a pointer to the User struct and an error.
 func (s *Store) GetUserByID(id string) (*types.User, error) {
-	return nil, nil
+	rows, err := s.db.Query("SELECT * FROM users WHERE id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+
+	u := new(types.User)
+	for rows.Next() {
+		u, err = scanRowIntoUser(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if u.ID == 0 {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return u, nil
 }
 
 // CreateUser creates a new user in the database.
 // It takes a User struct as a parameter.
 // It returns an error if the creation fails.
 func (s *Store) CreateUser(u types.User) error {
+	_, err := s.db.Exec("INSERT INTO users(name, email, password) VALUES($1, $2, $3)", u.Name, u.Email, u.Password)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

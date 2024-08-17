@@ -47,6 +47,8 @@ func (m *MiddlewareService) RateLimit(limit int, window time.Duration) func(http
 				http.Error(w, "Too many requests", http.StatusTooManyRequests)
 				return
 			}
+
+			next.ServeHTTP(w, r)
 		})
 	}
 }
