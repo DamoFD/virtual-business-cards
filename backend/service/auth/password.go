@@ -27,5 +27,5 @@ var ComparePassword = func(hash string, plain []byte) bool {
 // It takes a password string and a confirm password string as parameters.
 // It returns true if the passwords match, false otherwise.
 func ConfirmPassword(password string, confirmPassword string) bool {
-    return password == confirmPassword
+	return password == confirmPassword
 }

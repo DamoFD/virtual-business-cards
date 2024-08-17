@@ -35,3 +35,19 @@ func TestComparePassword(t *testing.T) {
 		t.Errorf("Expected password to not match hashed password")
 	}
 }
+
+func TestConfirmPassword(t *testing.T) {
+	password := "password"
+	confirmPassword := "password"
+	t.Run("passwords match", func(t *testing.T) {
+		if !ConfirmPassword(password, confirmPassword) {
+			t.Errorf("Expected passwords to match")
+		}
+	})
+
+	t.Run("passwords don't match", func(t *testing.T) {
+		if ConfirmPassword(password, "wrong-password") {
+			t.Errorf("Expected passwords to not match")
+		}
+	})
+}

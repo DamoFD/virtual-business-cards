@@ -116,32 +116,32 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    // confirm the password
-    confirmed := auth.ConfirmPassword(payload.Password, payload.ConfirmPassword)
-    if !confirmed {
-        utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("passwords do not match"))
-        return
-    }
+	// confirm the password
+	confirmed := auth.ConfirmPassword(payload.Password, payload.ConfirmPassword)
+	if !confirmed {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("passwords do not match"))
+		return
+	}
 
-    // hash the password
-    hashedPassword, err := auth.HashPassword(payload.Password)
-    if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return
-    }
+	// hash the password
+	hashedPassword, err := auth.HashPassword(payload.Password)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
-    // if it doesn't exist, create the user
-    user := types.User{
-        Name: payload.Name,
-        Email: payload.Email,
-        Password: hashedPassword,
-    }
-    err = h.store.CreateUser(user)
-    if err != nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return
-    }
+	// if it doesn't exist, create the user
+	user := types.User{
+		Name:     payload.Name,
+		Email:    payload.Email,
+		Password: hashedPassword,
+	}
+	err = h.store.CreateUser(user)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
-    // return StatusCreated
-    utils.WriteJSON(w, http.StatusCreated, nil)
+	// return StatusCreated
+	utils.WriteJSON(w, http.StatusCreated, nil)
 }
