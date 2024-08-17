@@ -5,14 +5,25 @@ It contains a struct User and a struct LoginUserPayload that are used in the API
 package types
 
 import (
+	"context"
 	"net/http"
 	"time"
+
+	"github.com/go-redis/redis/v8"
 )
 
+// RedisClient is an interface for the Redis client.
+type RedisClient interface {
+	Incr(ctx context.Context, key string) *redis.IntCmd
+	Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd
+}
+
+// Middleware is an interface for the middleware.
 type Middleware interface {
 	RateLimit(limit int, window time.Duration) func(http.Handler) http.Handler
 }
 
+// Auth is an interface for the authentication.
 type Auth interface {
 	HashPassword(password string) (string, error)
 	ComparePassword(hash string, plain []byte) bool
