@@ -2,10 +2,12 @@ package user
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -24,8 +26,8 @@ func TestHandleRegister(t *testing.T) {
 		ConfirmPasswordFn: func(password string, confirmPassword string) bool {
 			return true
 		},
-		CreateJWTFn: func(secret []byte, userID int) (string, error) {
-			return "token", nil
+		SetSessionFn: func(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
+			return "session_id", nil
 		},
 	}
 

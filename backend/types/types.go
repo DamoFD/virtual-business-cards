@@ -29,7 +29,6 @@ type Auth interface {
 	HashPassword(password string) (string, error)
 	ComparePassword(hash string, plain []byte) bool
 	ConfirmPassword(password string, confirmPassword string) bool
-	CreateJWT(secret []byte, userID int) (string, error)
 	SetSession(ctx context.Context, u *User, expiration time.Duration) (string, error)
 }
 

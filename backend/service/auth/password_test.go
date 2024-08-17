@@ -31,6 +31,15 @@ func (m *MockRedisClient) Expire(ctx context.Context, key string, expiration tim
 }
 
 func (m *MockRedisClient) Set(ctx context.Context, sessionID string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+	switch v := value.(type) {
+	case []byte:
+		m.data[sessionID] = string(v)
+	case string:
+		m.data[sessionID] = v
+	default:
+		m.data[sessionID] = ""
+	}
+
 	return redis.NewStatusResult("OK", nil)
 }
 

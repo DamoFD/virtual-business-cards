@@ -19,7 +19,6 @@ type mockAuth struct {
 	HashPasswordFn    func(password string) (string, error)
 	ComparePasswordFn func(hash string, plain []byte) bool
 	ConfirmPasswordFn func(password string, confirmPassword string) bool
-	CreateJWTFn       func(secret []byte, userID int) (string, error)
 	SetSessionFn      func(ctx context.Context, u *types.User, expiration time.Duration) (string, error)
 }
 
@@ -33,10 +32,6 @@ func (m *mockAuth) ComparePassword(hash string, plain []byte) bool {
 
 func (m *mockAuth) ConfirmPassword(password string, confirmPassword string) bool {
 	return m.ConfirmPasswordFn(password, confirmPassword)
-}
-
-func (m *mockAuth) CreateJWT(secret []byte, userID int) (string, error) {
-	return m.CreateJWTFn(secret, userID)
 }
 
 func (m *mockAuth) SetSession(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
