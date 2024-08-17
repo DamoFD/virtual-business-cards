@@ -49,7 +49,7 @@ func (s *APIServer) Run() error {
 	router := mux.NewRouter()
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
-	auth := auth.NewAuthService()
+	auth := auth.NewAuthService(s.rdb)
 	middleware := middleware.NewMiddlewareService(s.rdb)
 
 	// Register user routes

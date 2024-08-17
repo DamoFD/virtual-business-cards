@@ -2,11 +2,13 @@ package user
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -18,6 +20,7 @@ type mockAuth struct {
 	ComparePasswordFn func(hash string, plain []byte) bool
 	ConfirmPasswordFn func(password string, confirmPassword string) bool
 	CreateJWTFn       func(secret []byte, userID int) (string, error)
+	SetSessionFn      func(ctx context.Context, u *types.User, expiration time.Duration) (string, error)
 }
 
 func (m *mockAuth) HashPassword(password string) (string, error) {
@@ -34,6 +37,10 @@ func (m *mockAuth) ConfirmPassword(password string, confirmPassword string) bool
 
 func (m *mockAuth) CreateJWT(secret []byte, userID int) (string, error) {
 	return m.CreateJWTFn(secret, userID)
+}
+
+func (m *mockAuth) SetSession(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
+	return m.SetSessionFn(ctx, u, expiration)
 }
 
 type mockUserStore struct {
@@ -69,8 +76,8 @@ func sendPayload(payload interface{}, route string, t *testing.T) *httptest.Resp
 		ConfirmPasswordFn: func(password string, confirmPassword string) bool {
 			return true
 		},
-		CreateJWTFn: func(secret []byte, userID int) (string, error) {
-			return "token", nil
+		SetSessionFn: func(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
+			return "session_id", nil
 		},
 	}
 

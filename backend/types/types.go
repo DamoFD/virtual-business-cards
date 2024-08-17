@@ -16,6 +16,7 @@ import (
 type RedisClient interface {
 	Incr(ctx context.Context, key string) *redis.IntCmd
 	Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd
+	Set(ctx context.Context, sessionID string, value interface{}, expiration time.Duration) *redis.StatusCmd
 }
 
 // Middleware is an interface for the middleware.
@@ -29,6 +30,7 @@ type Auth interface {
 	ComparePassword(hash string, plain []byte) bool
 	ConfirmPassword(password string, confirmPassword string) bool
 	CreateJWT(secret []byte, userID int) (string, error)
+	SetSession(ctx context.Context, u *User, expiration time.Duration) (string, error)
 }
 
 // UserStore is an interface for the user store.
@@ -47,6 +49,14 @@ type User struct {
 	Password  string `json:"password"`   // User password
 	CreatedAt string `json:"created_at"` // User creation date
 	UpdatedAt string `json:"updated_at"` // User last updated
+}
+
+type SessionData struct {
+	UserID    int    `json:"user_id"`
+	Email     string `json:"email"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 // LoginUserPayload is a struct that represents a login user payload.

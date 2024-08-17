@@ -29,6 +29,10 @@ func (m *MockRedisClient) Expire(ctx context.Context, key string, expiration tim
 	return redis.NewBoolResult(true, nil)
 }
 
+func (m *MockRedisClient) Set(ctx context.Context, sessionID string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+	return redis.NewStatusResult("OK", nil)
+}
+
 func stringToInt(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i

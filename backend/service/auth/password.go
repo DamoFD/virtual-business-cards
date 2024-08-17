@@ -6,10 +6,21 @@ import (
 	"github.com/DamoFD/virtual-business/types"
 )
 
-type AuthService struct{}
+// AuthService is a struct that contains the redis client interface.
+// It contains a method HashPassword() that hashes a password with bcrypt.
+// It contains a method ComparePassword() that compares a hashed password with a plain password.
+// It contains a method ConfirmPassword() that checks if two passwords match.
+type AuthService struct {
+	rdb types.RedisClient
+}
 
-func NewAuthService() types.Auth {
-	return &AuthService{}
+// NewAuthService initializes the auth service.
+// It takes a redis client interface as an argument.
+// It returns a *AuthService.
+func NewAuthService(rdb types.RedisClient) types.Auth {
+	return &AuthService{
+		rdb: rdb,
+	}
 }
 
 // HashPassword hashes a password with bcrypt.

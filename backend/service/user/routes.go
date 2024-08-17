@@ -7,6 +7,7 @@ It contains a method handleRegister() that handles the register route.
 package user
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -14,7 +15,6 @@ import (
 	validator "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
-	"github.com/DamoFD/virtual-business/config"
 	"github.com/DamoFD/virtual-business/types"
 	"github.com/DamoFD/virtual-business/utils"
 )
@@ -77,16 +77,24 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a JWT token
-	secret := []byte(config.Envs.JWTSecret)
-	token, err := h.auth.CreateJWT(secret, u.ID)
+	// Create a session
+	ctx := context.Background()
+	sessionID, err := h.auth.SetSession(ctx, u, time.Hour*24)
 	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("could not create session"))
 		return
 	}
 
-	// Return the JWT token
-	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
+	// Set the session ID in a cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_id",
+		Value:    sessionID,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HttpOnly: true,
+	})
+
+	// Respond with a success message
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "login successful"})
 }
 
 // handleRegister handles the register route.

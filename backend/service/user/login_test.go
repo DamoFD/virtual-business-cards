@@ -2,11 +2,13 @@ package user
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 
@@ -26,8 +28,8 @@ func TestHandleLogin(t *testing.T) {
 		ConfirmPasswordFn: func(password string, confirmPassword string) bool {
 			return true
 		},
-		CreateJWTFn: func(secret []byte, userID int) (string, error) {
-			return "token", nil
+		SetSessionFn: func(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
+			return "session_id", nil
 		},
 	}
 
@@ -124,8 +126,8 @@ func TestHandleLogin(t *testing.T) {
 			return true
 		}
 
-		mockAuth.CreateJWTFn = func(secret []byte, userID int) (string, error) {
-			return "token", nil
+		mockAuth.SetSessionFn = func(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
+			return "session_id", nil
 		}
 
 		validPayload := types.LoginUserPayload{Email: "ZkX8x@example.com", Password: "password"}
@@ -143,7 +145,7 @@ func TestHandleLogin(t *testing.T) {
 			t.Errorf("unexpected status code: got %v want %v", status, http.StatusOK)
 		}
 
-		expectedBody := `{"token":"token"}` + "\n"
+		expectedBody := `{"message":"login successful"}` + "\n"
 		if rr.Body.String() != expectedBody {
 			t.Errorf("unexpected body: got %v want %v", rr.Body.String(), expectedBody)
 		}
