@@ -4,11 +4,13 @@ It contains a struct User and a struct LoginUserPayload that are used in the API
 */
 package types
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 type Middleware interface {
-    RateLimit(next http.HandlerFunc) http.HandlerFunc
-    WithJWTAuth(handlerFunc http.HandlerFunc, store UserStore) http.HandlerFunc
+	RateLimit(limit int, window time.Duration) func(http.Handler) http.Handler
 }
 
 type Auth interface {

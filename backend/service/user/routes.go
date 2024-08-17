@@ -9,6 +9,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
@@ -39,9 +40,9 @@ func NewHandler(store types.UserStore, auth types.Auth) *Handler {
 
 // RegisterRoutes registers the user routes and methods.
 // It takes a router as a parameter.
-func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/login", h.handleLogin).Methods("POST")
-	router.HandleFunc("/register", h.handleRegister).Methods("POST")
+func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware) {
+	router.Handle("/login", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogin))).Methods("POST")
+	router.Handle("/register", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleRegister))).Methods("POST")
 }
 
 // handleLogin handles the login route.

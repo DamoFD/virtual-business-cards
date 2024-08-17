@@ -22,6 +22,10 @@ type Config struct {
 	DBSSLMode              string // SSL mode for the database.
 	JWTExpirationInSeconds int64  // JWT expiration in seconds.
 	JWTSecret              string // JWT secret key.
+	RedisHost              string // Redis host
+	RedisPort              string // Redis port
+	RedisPassword          string // Redis password
+	RedisDB                int64  // Redis database
 }
 
 // Envs contains configurations for the API server.
@@ -43,6 +47,10 @@ func initConfig() Config {
 		DBSSLMode:              getEnv("DB_SSL_MODE", "disable"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
 		JWTSecret:              getEnv("JWT_SECRET", "secret"),
+		RedisHost:              getEnv("REDIS_HOST", "redis"),
+		RedisPort:              getEnv("REDIS_PORT", "6379"),
+		RedisPassword:          getEnv("REDIS_PASSWORD", ""),
+		RedisDB:                getEnvAsInt("REDIS_DB", 0),
 	}
 }
 
