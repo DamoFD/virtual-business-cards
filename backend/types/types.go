@@ -31,13 +31,13 @@ type User struct {
 
 // LoginUserPayload is a struct that represents a login user payload.
 type LoginUserPayload struct {
-	Email    string `json:"email" validate:"required,email"` // User email
-	Password string `json:"password" validate:"required"`    // User password
+	Email    string `json:"email" validate:"required,email,min=2,max=320"` // User email
+	Password string `json:"password" validate:"required,min=6,max=100"`    // User password
 }
 
 type RegisterUserPayload struct {
-	Name            string `json:"name" validate:"required"`             // User name
-	Email           string `json:"email" validate:"required,email"`      // User email
-	Password        string `json:"password" validate:"required"`         // User password
-	ConfirmPassword string `json:"confirm_password" validate:"required"` // User confirm password
+	Name            string `json:"name" validate:"required,min=2,max=100"`             // User name
+	Email           string `json:"email" validate:"required,email,max=320"`            // User email
+	Password        string `json:"password" validate:"required,min=6,max=100"`         // User password
+	ConfirmPassword string `json:"confirm_password" validate:"required,min=6,max=100"` // User confirm password
 }
