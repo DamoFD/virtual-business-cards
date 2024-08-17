@@ -11,10 +11,32 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
-	"github.com/DamoFD/virtual-business/service/auth"
 	"github.com/DamoFD/virtual-business/types"
 	"github.com/DamoFD/virtual-business/utils"
 )
+
+type mockAuth struct {
+	HashPasswordFn    func(password string) (string, error)
+	ComparePasswordFn func(hash string, plain []byte) bool
+	ConfirmPasswordFn func(password string, confirmPassword string) bool
+	CreateJWTFn       func(secret []byte, userID int) (string, error)
+}
+
+func (m *mockAuth) HashPassword(password string) (string, error) {
+	return m.HashPasswordFn(password)
+}
+
+func (m *mockAuth) ComparePassword(hash string, plain []byte) bool {
+	return m.ComparePasswordFn(hash, plain)
+}
+
+func (m *mockAuth) ConfirmPassword(password string, confirmPassword string) bool {
+	return m.ConfirmPasswordFn(password, confirmPassword)
+}
+
+func (m *mockAuth) CreateJWT(secret []byte, userID int) (string, error) {
+	return m.CreateJWTFn(secret, userID)
+}
 
 type mockUserStore struct {
 	user          *types.User
@@ -40,6 +62,21 @@ func (m *mockUserStore) CreateUser(u types.User) error {
 
 func TestHandleRegister(t *testing.T) {
 
+	mockAuth := &mockAuth{
+		HashPasswordFn: func(password string) (string, error) {
+			return "$2a$10$abc123abc123abc123abcO/abc123abc123abc123abc123abc123abc", nil
+		},
+		ComparePasswordFn: func(hash string, plain []byte) bool {
+			return true
+		},
+		ConfirmPasswordFn: func(password string, confirmPassword string) bool {
+			return true
+		},
+		CreateJWTFn: func(secret []byte, userID int) (string, error) {
+			return "token", nil
+		},
+	}
+
 	validUser := &types.User{
 		ID:        1,
 		Name:      "Test User",
@@ -53,7 +90,7 @@ func TestHandleRegister(t *testing.T) {
 		user: validUser,
 	}
 
-	handler := &Handler{store: mockStore}
+	handler := &Handler{store: mockStore, auth: mockAuth}
 
 	t.Run("invalid json", func(t *testing.T) {
 		req, err := http.NewRequest("POST", "/register", bytes.NewBufferString("{invalid json}"))
@@ -86,6 +123,10 @@ func TestHandleRegister(t *testing.T) {
 	})
 
 	t.Run("Passwords do not match", func(t *testing.T) {
+		mockAuth.ConfirmPasswordFn = func(password string, confirmPassword string) bool {
+			return false
+		}
+
 		req, err := http.NewRequest("POST", "/register", bytes.NewBufferString("{\"name\":\"\",\"email\":\"\",\"password\":\"password\",\"confirm_password\":\"not-matching\"}"))
 		if err != nil {
 			t.Fatalf("could not create request: %v", err)
@@ -116,10 +157,14 @@ func TestHandleRegister(t *testing.T) {
 	})
 
 	t.Run("Success", func(t *testing.T) {
+
+		mockAuth.ConfirmPasswordFn = func(password string, confirmPassword string) bool {
+			return true
+		}
 		mockStore := &mockUserStore{
 			user: nil,
 		}
-		handler := &Handler{store: mockStore}
+		handler := &Handler{store: mockStore, auth: mockAuth}
 
 		payload := types.RegisterUserPayload{
 			Name:            "New User",
@@ -147,6 +192,22 @@ func TestHandleRegister(t *testing.T) {
 }
 
 func TestHandleLogin(t *testing.T) {
+
+	mockAuth := &mockAuth{
+		HashPasswordFn: func(password string) (string, error) {
+			return "$2a$10$abc123abc123abc123abcO/abc123abc123abc123abc123abc123abc", nil
+		},
+		ComparePasswordFn: func(hash string, plain []byte) bool {
+			return true
+		},
+		ConfirmPasswordFn: func(password string, confirmPassword string) bool {
+			return true
+		},
+		CreateJWTFn: func(secret []byte, userID int) (string, error) {
+			return "token", nil
+		},
+	}
+
 	validUser := &types.User{
 		ID:        1,
 		Name:      "Test User",
@@ -160,7 +221,7 @@ func TestHandleLogin(t *testing.T) {
 		user: validUser,
 	}
 
-	handler := &Handler{store: mockStore}
+	handler := &Handler{store: mockStore, auth: mockAuth}
 
 	t.Run("invalid json", func(t *testing.T) {
 		req, err := http.NewRequest("POST", "/login", bytes.NewBufferString("{invalid json}"))
@@ -215,7 +276,7 @@ func TestHandleLogin(t *testing.T) {
 
 	t.Run("invalid password", func(t *testing.T) {
 		mockStore.getUserErr = nil
-		auth.ComparePassword = func(hash string, plain []byte) bool {
+		mockAuth.ComparePasswordFn = func(hash string, plain []byte) bool {
 			return false
 		}
 
@@ -236,11 +297,11 @@ func TestHandleLogin(t *testing.T) {
 	})
 
 	t.Run("successful login", func(t *testing.T) {
-		auth.ComparePassword = func(hash string, plain []byte) bool {
+		mockAuth.ComparePasswordFn = func(hash string, plain []byte) bool {
 			return true
 		}
 
-		auth.CreateJWT = func(secret []byte, userID int) (string, error) {
+		mockAuth.CreateJWTFn = func(secret []byte, userID int) (string, error) {
 			return "token", nil
 		}
 

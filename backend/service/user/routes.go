@@ -14,7 +14,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/DamoFD/virtual-business/config"
-	"github.com/DamoFD/virtual-business/service/auth"
 	"github.com/DamoFD/virtual-business/types"
 	"github.com/DamoFD/virtual-business/utils"
 )
@@ -25,14 +24,16 @@ import (
 // It contains a method handleRegister() that handles the register route.
 type Handler struct {
 	store types.UserStore // user store
+	auth  types.Auth
 }
 
 // NewHandler creates a new user handler.
 // It takes a user store as a parameter.
 // It returns a pointer to the Handler struct.
-func NewHandler(store types.UserStore) *Handler {
+func NewHandler(store types.UserStore, auth types.Auth) *Handler {
 	return &Handler{
 		store: store,
+		auth:  auth,
 	}
 }
 
@@ -70,14 +71,14 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Compare the plain password with the hashed password
-	if !auth.ComparePassword(u.Password, []byte(payload.Password)) {
+	if !h.auth.ComparePassword(u.Password, []byte(payload.Password)) {
 		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid credentials"))
 		return
 	}
 
 	// Create a JWT token
 	secret := []byte(config.Envs.JWTSecret)
-	token, err := auth.CreateJWT(secret, u.ID)
+	token, err := h.auth.CreateJWT(secret, u.ID)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
@@ -117,14 +118,14 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// confirm the password
-	confirmed := auth.ConfirmPassword(payload.Password, payload.ConfirmPassword)
+	confirmed := h.auth.ConfirmPassword(payload.Password, payload.ConfirmPassword)
 	if !confirmed {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("passwords do not match"))
 		return
 	}
 
 	// hash the password
-	hashedPassword, err := auth.HashPassword(payload.Password)
+	hashedPassword, err := h.auth.HashPassword(payload.Password)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return

@@ -4,6 +4,13 @@ It contains a struct User and a struct LoginUserPayload that are used in the API
 */
 package types
 
+type Auth interface {
+	HashPassword(password string) (string, error)
+	ComparePassword(hash string, plain []byte) bool
+	ConfirmPassword(password string, confirmPassword string) bool
+	CreateJWT(secret []byte, userID int) (string, error)
+}
+
 // UserStore is an interface for the user store.
 // It contains methods for getting and creating users.
 type UserStore interface {
