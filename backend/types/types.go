@@ -4,6 +4,13 @@ It contains a struct User and a struct LoginUserPayload that are used in the API
 */
 package types
 
+import "net/http"
+
+type Middleware interface {
+    RateLimit(next http.HandlerFunc) http.HandlerFunc
+    WithJWTAuth(handlerFunc http.HandlerFunc, store UserStore) http.HandlerFunc
+}
+
 type Auth interface {
 	HashPassword(password string) (string, error)
 	ComparePassword(hash string, plain []byte) bool
