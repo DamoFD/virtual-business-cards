@@ -25,7 +25,7 @@ import (
 // It contains a method handleRegister() that handles the register route.
 type Handler struct {
 	store types.UserStore // user store
-	auth  types.Auth
+	auth  types.Auth      // auth service
 }
 
 // NewHandler creates a new user handler.
@@ -44,6 +44,40 @@ func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware
 	router.Handle("/login", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogin))).Methods("POST")
 	router.Handle("/register", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleRegister))).Methods("POST")
 	router.Handle("/@me", middleware.RateLimit(100, time.Minute)(http.HandlerFunc(h.handleMe))).Methods("GET")
+	router.Handle("/logout", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogout))).Methods("POST")
+}
+
+// handleLogout handles the lgout route.
+func (h *Handler) handleLogout(w http.ResponseWriter, r *http.Request) {
+
+	// Retrieve the session ID from the cookie
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("session not found"))
+		return
+	}
+
+	// Delete the session using the session ID from the cookie
+	ctx := r.Context()
+	err = h.auth.DeleteSession(ctx, cookie.Value)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid session"))
+		return
+	}
+
+	// Delete the cookie by setting a past expiration date
+	cookie = &http.Cookie{
+		Name:     "session_id",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
+
+	// If everything is successful, return an empty response
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "Logged out successfully"})
 }
 
 // handleMe handles the @me route.
@@ -51,7 +85,6 @@ func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware
 // It returns an error if the session is not found or invalid.
 // It returns the session data if everything is successful.
 func (h *Handler) handleMe(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Route is working")
 
 	// Retrieve the session ID from the cookie
 	cookie, err := r.Cookie("session_id")
