@@ -17,6 +17,8 @@ type RedisClient interface {
 	Incr(ctx context.Context, key string) *redis.IntCmd
 	Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd
 	Set(ctx context.Context, sessionID string, value interface{}, expiration time.Duration) *redis.StatusCmd
+	Get(ctx context.Context, sessionID string) *redis.StringCmd
+	Del(ctx context.Context, sessionID ...string) *redis.IntCmd
 }
 
 // Middleware is an interface for the middleware.
@@ -30,6 +32,8 @@ type Auth interface {
 	ComparePassword(hash string, plain []byte) bool
 	ConfirmPassword(password string, confirmPassword string) bool
 	SetSession(ctx context.Context, u *User, expiration time.Duration) (string, error)
+	GetSession(ctx context.Context, sessionID string) (*SessionData, error)
+	DeleteSession(ctx context.Context, sessionID string) error
 }
 
 // UserStore is an interface for the user store.

@@ -20,6 +20,8 @@ type mockAuth struct {
 	ComparePasswordFn func(hash string, plain []byte) bool
 	ConfirmPasswordFn func(password string, confirmPassword string) bool
 	SetSessionFn      func(ctx context.Context, u *types.User, expiration time.Duration) (string, error)
+	GetSessionFn      func(ctx context.Context, sessionID string) (*types.SessionData, error)
+	DeleteSessionFn   func(ctx context.Context, sessionID string) error
 }
 
 func (m *mockAuth) HashPassword(password string) (string, error) {
@@ -36,6 +38,14 @@ func (m *mockAuth) ConfirmPassword(password string, confirmPassword string) bool
 
 func (m *mockAuth) SetSession(ctx context.Context, u *types.User, expiration time.Duration) (string, error) {
 	return m.SetSessionFn(ctx, u, expiration)
+}
+
+func (m *mockAuth) GetSession(ctx context.Context, sessionID string) (*types.SessionData, error) {
+	return m.GetSessionFn(ctx, sessionID)
+}
+
+func (m *mockAuth) DeleteSession(ctx context.Context, sessionID string) error {
+	return m.DeleteSessionFn(ctx, sessionID)
 }
 
 type mockUserStore struct {

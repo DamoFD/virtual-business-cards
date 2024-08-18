@@ -43,6 +43,14 @@ func (m *MockRedisClient) Set(ctx context.Context, sessionID string, value inter
 	return redis.NewStatusResult("OK", nil)
 }
 
+func (m *MockRedisClient) Get(ctx context.Context, sessionID string) *redis.StringCmd {
+	return redis.NewStringResult(m.data[sessionID], nil)
+}
+
+func (m *MockRedisClient) Del(ctx context.Context, sessionID ...string) *redis.IntCmd {
+	return redis.NewIntResult(1, nil)
+}
+
 func stringToInt(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i

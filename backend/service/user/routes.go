@@ -43,6 +43,33 @@ func NewHandler(store types.UserStore, auth types.Auth) *Handler {
 func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware) {
 	router.Handle("/login", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogin))).Methods("POST")
 	router.Handle("/register", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleRegister))).Methods("POST")
+	router.Handle("/@me", middleware.RateLimit(100, time.Minute)(http.HandlerFunc(h.handleMe))).Methods("GET")
+}
+
+// handleMe handles the @me route.
+// It takes a http.ResponseWriter and a *http.Request as parameters.
+// It returns an error if the session is not found or invalid.
+// It returns the session data if everything is successful.
+func (h *Handler) handleMe(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Route is working")
+
+	// Retrieve the session ID from the cookie
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("session not found"))
+		return
+	}
+
+	// Get the session data using the session ID from the cookie
+	ctx := r.Context()
+	sessionData, err := h.auth.GetSession(ctx, cookie.Value)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid session"))
+		return
+	}
+
+	// If everything is successful, return the session data
+	utils.WriteJSON(w, http.StatusOK, sessionData)
 }
 
 // handleLogin handles the login route.
