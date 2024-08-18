@@ -152,6 +152,24 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// After successful registration, log in the user
+
+	// Create a session
+	ctx := context.Background()
+	sessionID, err := h.auth.SetSession(ctx, &user, time.Hour*24)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("could not create session"))
+		return
+	}
+
+	// Set the session ID in a cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_id",
+		Value:    sessionID,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HttpOnly: true,
+	})
+
 	// return StatusCreated
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	utils.WriteJSON(w, http.StatusCreated, map[string]string{"message": "registration and login successful"})
 }
