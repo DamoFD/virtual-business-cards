@@ -92,11 +92,23 @@ func (s *Store) GetUserByID(id string) (*types.User, error) {
 // CreateUser creates a new user in the database.
 // It takes a User struct as a parameter.
 // It returns an error if the creation fails.
-func (s *Store) CreateUser(u types.User) error {
-	_, err := s.db.Exec("INSERT INTO users(name, email, password) VALUES($1, $2, $3)", u.Name, u.Email, u.Password)
-	if err != nil {
-		return err
-	}
+func (s *Store) CreateUser(u types.User) (types.User, error) {
+    var user types.User
 
-	return nil
+    query := "INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING id, name, email, password, created_at, updated_at"
+
+    err := s.db.QueryRow(query, u.Name, u.Email, u.Password).Scan(
+        &user.ID,
+        &user.Name,
+        &user.Email,
+        &user.Password,
+        &user.CreatedAt,
+        &user.UpdatedAt,
+    )
+
+    if err != nil {
+        return user, err
+    }
+
+	return user, nil
 }
