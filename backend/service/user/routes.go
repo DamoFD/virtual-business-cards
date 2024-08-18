@@ -146,7 +146,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		Email:    payload.Email,
 		Password: hashedPassword,
 	}
-    user, err = h.store.CreateUser(user)
+	user, err = h.store.CreateUser(user)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
@@ -156,7 +156,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	// Create a session
 	ctx := context.Background()
-    sessionID, err := h.auth.SetSession(ctx, &user, time.Hour*24)
+	sessionID, err := h.auth.SetSession(ctx, &user, time.Hour*24)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("could not create session"))
 		return

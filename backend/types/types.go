@@ -37,7 +37,7 @@ type Auth interface {
 type UserStore interface {
 	GetUserByEmail(email string) (*User, error) // Get user by email
 	GetUserByID(id string) (*User, error)       // Get user by ID
-	CreateUser(User) (User, error)                      // Create user
+	CreateUser(User) (User, error)              // Create user
 }
 
 // User is a struct that represents a user.

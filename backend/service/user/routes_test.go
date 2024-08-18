@@ -56,8 +56,8 @@ func (m *mockUserStore) GetUserByID(id string) (*types.User, error) {
 	return nil, nil
 }
 
-func (m *mockUserStore) CreateUser(u types.User) error {
-	return m.createUserErr
+func (m *mockUserStore) CreateUser(u types.User) (types.User, error) {
+	return types.User{}, m.createUserErr
 }
 
 func sendPayload(payload interface{}, route string, t *testing.T) *httptest.ResponseRecorder {
