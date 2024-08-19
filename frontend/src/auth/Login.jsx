@@ -6,13 +6,11 @@ import GetColors from '../colors/GetColors';
 import Stepper from '../editor/components/Stepper';
 import Input from '../editor/components/Input';
 import axiosClient from '../axios-client';
-import registerSchema from '../validation/registerSchema';
+import loginSchema from '../validation/loginSchema';
 
-const Register = () => {
-    const [name, setName] = useState('')
+const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('') 
-    const [confirmPassword, setConfirmPassword] = useState('')
     const [errors, setErrors] = useState({})
 
     const { card } = useContext(CardContext)
@@ -20,20 +18,18 @@ const Register = () => {
     const { fetchUser } = useAuth();
     const navigate = useNavigate();
 
-    const handleRegister = async () => {
+    const handleLogin = async () => {
         try {
             // reset errors
             setErrors({});
 
             // Validate the data
-            await registerSchema.validate({ name, email, password, confirmPassword }, { abortEarly: false });
+            await loginSchema.validate({ email, password }, { abortEarly: false });
 
             // If validation passes, prodceed with the API call
-            await axiosClient.post('register', {
-                'name': name,
+            await axiosClient.post('login', {
                 'email': email,
                 'password': password,
-                'confirm_password': confirmPassword
             });
 
             // set user
@@ -42,6 +38,7 @@ const Register = () => {
             // redirect to Dashboard
             navigate('/dashboard');
         } catch (error) {
+            console.error(error);
             //setError(error.response.data.error);
             if (error.name === 'ValidationError') {
                 const validationErrors = {};
@@ -62,14 +59,11 @@ const Register = () => {
         <div className="w-full bg-brand-background flex flex-col items-center">
             <Stepper colors={colors} />
             <div className="mt-10">
-                <h1 className="text-3xl font-extrabold text-brand-black mt-10 font-inter z-[2] relative">Create a new account</h1>
-                <p className="text-brand-black font-hanken text-lg">Time to bring your card to life! Create an account to save your changes and share it with others.</p>
+                <h1 className="text-3xl font-extrabold text-brand-black mt-10 font-inter z-[2] relative">Login to your account</h1>
+                <p className="text-brand-black font-hanken text-lg">Time to bring your card to life! Login to save your changes and share it with others.</p>
                 {errors.api && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.api}</p>}
 
                 <div>
-
-                    <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} autoFocus={true} color={errors.name ? 'red-500' : null} />
-                    {errors.name && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.name}</p>}
 
                     <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} color={errors.email ? 'red-500' : null} />
                     {errors.email && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.email}</p>}
@@ -77,12 +71,10 @@ const Register = () => {
                     <Input label="Password" value={password} onChange={(e) => setPassword(e.target.value)} color={errors.password ? 'red-500' : null} />
                     {errors.password && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.password}</p>}
 
-                    <Input label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} color={errors.confirmPassword ? 'red-500' : null} />
-                    {errors.confirmPassword && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.confirmPassword}</p>}
                     <button
                         className="card-depth px-4 py-2 font-hanken mt-8"
                         style={{ background: colors[1] }}
-                        onClick={handleRegister}
+                        onClick={handleLogin}
                     >Continue</button>
                 </div>
 
@@ -103,4 +95,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default Login;
