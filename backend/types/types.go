@@ -47,10 +47,12 @@ type UserStore interface {
 
 type CardStore interface {
 	GetCardBySlug(slug string) (*CardResponse, error)
+	GetCardBySlugExcludingID(slug string, cardID int) (*Card, error)
 	GetCardsByUserID(userID int) ([]*Card, error)
 	CreateCard(ctx context.Context, card Card) (Card, error)
 	CreateCardItemField(ctx context.Context, f CardItemField) error
-	UpdateCard(ctx context.Context, card Card) (Card, error)
+	UpdateCard(ctx context.Context, card Card, cardID int) (Card, error)
+	DeleteCardItemFieldsByCardID(ctx context.Context, cardID int) error
 	DeleteCard(ctx context.Context, cardID int) error
 }
 
