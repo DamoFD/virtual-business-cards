@@ -65,6 +65,33 @@ func (m *MiddlewareService) RateLimit(limit int, window time.Duration) func(http
 	}
 }
 
+// Auth validates the session ID with Redis.
+// It takes a http.Handler and returns a http.Handler.
+func (m *MiddlewareService) Auth() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			// Retrieve the session ID from the cookie
+			cookie, err := r.Cookie("session_id")
+			if err != nil {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Validate the session ID with Redis
+			ctx := context.Background()
+			sessionData, err := m.rdb.Get(ctx, cookie.Value).Result()
+			if err != nil || sessionData == "" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// If session is valid, proceed to the next handler
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
 // createKey creates a unique key for the client and route
 // It takes a *http.Request as an argument.
 // It returns a string.

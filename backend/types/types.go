@@ -24,6 +24,7 @@ type RedisClient interface {
 // Middleware is an interface for the middleware.
 type Middleware interface {
 	RateLimit(limit int, window time.Duration) func(http.Handler) http.Handler
+	Auth() func(http.Handler) http.Handler
 }
 
 // Auth is an interface for the authentication.
@@ -44,6 +45,14 @@ type UserStore interface {
 	CreateUser(User) (User, error)              // Create user
 }
 
+type CardStore interface {
+	GetCardBySlug(slug string) (*Card, error)
+	GetCardsByUserID(userID int) ([]*Card, error)
+	CreateCard(ctx context.Context, card Card) (Card, error)
+	UpdateCard(ctx context.Context, card Card) (Card, error)
+	DeleteCard(ctx context.Context, cardID int) error
+}
+
 // User is a struct that represents a user.
 type User struct {
 	ID        int    `json:"id"`         // User ID
@@ -52,6 +61,35 @@ type User struct {
 	Password  string `json:"password"`   // User password
 	CreatedAt string `json:"created_at"` // User creation date
 	UpdatedAt string `json:"updated_at"` // User last updated
+}
+
+type Card struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Slug      string `json:"slug"`
+	UserID    int    `json:"user_id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type CardPayload struct {
+	Name string `json:"name" validate:"required,min=2,max=100"`
+	Slug string `json:"slug" validate:"required,min=2,max=100,slug"`
+}
+
+type CardItem struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type CardItemField struct {
+	ID         int    `json:"id"`
+	CardID     int    `json:"card_id"`
+	CardItemID int    `json:"card_item_id"`
+	Name       string `json:"name"`
+	Value      string `json:"value"`
+	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
 }
 
 type SessionData struct {

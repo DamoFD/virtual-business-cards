@@ -41,13 +41,25 @@ func NewHandler(store types.UserStore, auth types.Auth) *Handler {
 // RegisterRoutes registers the user routes and methods.
 // It takes a router and a middleware as parameters.
 func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware) {
+
+	// Public routes
 	router.Handle("/login", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogin))).Methods("POST")
 	router.Handle("/register", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleRegister))).Methods("POST")
-	router.Handle("/@me", middleware.RateLimit(100, time.Minute)(http.HandlerFunc(h.handleMe))).Methods("GET")
-	router.Handle("/logout", middleware.RateLimit(10, time.Minute)(http.HandlerFunc(h.handleLogout))).Methods("POST")
+
+	// Authenticated route group
+	authRouter := router.PathPrefix("/").Subrouter()
+	authRouter.Use(middleware.Auth())
+	authRouter.Use(middleware.RateLimit(100, time.Minute))
+
+	// Protected routes
+	authRouter.Handle("/@me", http.HandlerFunc(h.handleMe)).Methods("GET")
+	authRouter.Handle("/logout", http.HandlerFunc(h.handleLogout)).Methods("POST")
 }
 
-// handleLogout handles the lgout route.
+// handleLogout handles the logout route.
+// It takes a http.ResponseWriter and a *http.Request as parameters.
+// It returns "Logged out successfully" if the logout is successful.
+// It returns an error if the logout fails.
 func (h *Handler) handleLogout(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve the session ID from the cookie

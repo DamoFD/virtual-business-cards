@@ -20,6 +20,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/DamoFD/virtual-business/service/auth"
+	"github.com/DamoFD/virtual-business/service/card"
 	"github.com/DamoFD/virtual-business/service/middleware"
 	"github.com/DamoFD/virtual-business/service/user"
 )
@@ -56,6 +57,11 @@ func (s *APIServer) Run() error {
 	userStore := user.NewStore(s.db)
 	userHandler := user.NewHandler(userStore, auth)
 	userHandler.RegisterRoutes(subrouter, middleware)
+
+	// Register card routes
+	cardStore := card.NewStore(s.db)
+	cardHandler := card.NewHandler(cardStore, auth)
+	cardHandler.RegisterRoutes(subrouter, middleware)
 
 	log.Println("Listening on", s.addr)
 

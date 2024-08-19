@@ -10,12 +10,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/go-playground/validator/v10"
 )
 
 // Validate is a validator instance
 var Validate = validator.New()
+
+func init() {
+	Validate.RegisterValidation("slug", validateSlug)
+}
 
 // ParseJSON parses a JSON request body into a struct
 // It takes a *http.Request and a pointer to a struct as arguments.
@@ -43,4 +48,12 @@ func WriteJSON(w http.ResponseWriter, status int, payload any) error {
 // and returns an error if the writing fails.
 func WriteError(w http.ResponseWriter, status int, err error) {
 	WriteJSON(w, status, map[string]string{"error": err.Error()})
+}
+
+func validateSlug(fl validator.FieldLevel) bool {
+	slug := fl.Field().String()
+
+	var slugRegex = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
+
+	return slugRegex.MatchString(slug)
 }
