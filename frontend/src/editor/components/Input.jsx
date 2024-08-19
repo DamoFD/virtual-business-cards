@@ -1,4 +1,5 @@
-const Input = ({label, value, onChange, autoFocus, handleKeyDown}) => {
+const Input = ({label, value, onChange, autoFocus, handleKeyDown, color}) => {
+
     return (
         <div className="relative mt-4 max-w-full group font-hasken">
             <input
@@ -12,7 +13,7 @@ const Input = ({label, value, onChange, autoFocus, handleKeyDown}) => {
             />
 
             <label
-                className="
+                className={`
                     absolute
                     left-[9px]
                     top-px
@@ -28,23 +29,23 @@ const Input = ({label, value, onChange, autoFocus, handleKeyDown}) => {
                     peer-placeholder-shown:text-xl
                     group-focus-within:!top-px
                     group-focus-within:!text-sm
-                    group-focus-within:!text-green-600"
+                    group-focus-within:!text-${color || 'green-600'}`}
             >{label}</label>
 
             <fieldset
-                className="
+                className={`
                     inset-0
                     absolute
                     border
-                    border-gray-400
+                    border-${color || 'gray-400'}
                     rounded
                     pointer-events-none
                     mt-[-9px]
                     invisible
                     peer-placeholder-shown:visible
-                    group-focus-within:!border-green-600
+                    group-focus-within:!border-${color || 'green-600'}
                     group-focus-within:border-2
-                    group-hover:border-gray-700"
+                    group-hover:border-${color || 'gray-700'}`}
             >
                 <legend
                     className="
@@ -62,19 +63,19 @@ const Input = ({label, value, onChange, autoFocus, handleKeyDown}) => {
             </fieldset>
 
             <fieldset
-                className="
+                className={`
                     inset-0
                     absolute
                     border
-                    border-gray-400
+                    border-${color || 'gray-400'}
                     rounded
                     pointer-events-none
                     mt-[-9px]
                     visible
                     peer-placeholder-shown:invisible
                     group-focus-within:border-2
-                    group-focus-within:!border-green-600
-                    group-hover:border-gray-700"
+                    group-focus-within:!border-${color || 'green-600'}
+                    group-hover:border-${color || 'gray-700'}`}
             >
                 <legend className="ml-2 text-sm invisible px-1 max-w-full whitespace-nowrap">{label}</legend>
             </fieldset>

@@ -4,18 +4,27 @@ import GetColors from '../colors/GetColors';
 import Stepper from '../editor/components/Stepper';
 import Input from '../editor/components/Input';
 import axiosClient from '../axios-client';
+import registerSchema from '../validation/registerSchema';
 
 const Register = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('') 
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [errors, setErrors] = useState({})
 
     const { card } = useContext(CardContext)
     const colors = GetColors(card.colors['Colors'])
 
     const handleRegister = async () => {
         try {
+            // reset errors
+            setErrors({});
+
+            // Validate the data
+            await registerSchema.validate({ name, email, password, confirmPassword }, { abortEarly: false });
+
+            // If validation passes, prodceed with the API call
             const response = await axiosClient.post('register', {
                 'name': name,
                 'email': email,
@@ -24,7 +33,17 @@ const Register = () => {
             });
             console.log('Register Successful', response.data);
         } catch (error) {
-            console.error('login failed', error.response.data);
+            //setError(error.response.data.error);
+            if (error.name === 'ValidationError') {
+                const validationErrors = {};
+                error.inner.forEach(err => {
+                    validationErrors[err.path] = err.message;
+                });
+                setErrors(validationErrors);
+            } else {
+                // Handle API errors
+                setErrors({ api: error.response.data.error });
+            }
         }
     }
 
@@ -34,12 +53,21 @@ const Register = () => {
             <div className="mt-10">
                 <h1 className="text-3xl font-extrabold text-brand-black mt-10 font-inter z-[2] relative">Create a new account</h1>
                 <p className="text-brand-black font-hanken text-lg">Time to bring your card to life! Create an account to save your changes and share it with others.</p>
+                {errors.api && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.api}</p>}
 
                 <div>
-                    <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} autoFocus={true} />
-                    <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <Input label="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <Input label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+
+                    <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} autoFocus={true} color={errors.name ? 'red-500' : null} />
+                    {errors.name && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.name}</p>}
+
+                    <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} color={errors.email ? 'red-500' : null} />
+                    {errors.email && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.email}</p>}
+
+                    <Input label="Password" value={password} onChange={(e) => setPassword(e.target.value)} color={errors.password ? 'red-500' : null} />
+                    {errors.password && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.password}</p>}
+
+                    <Input label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} color={errors.confirmPassword ? 'red-500' : null} />
+                    {errors.confirmPassword && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.confirmPassword}</p>}
                     <button
                         className="card-depth px-4 py-2 font-hanken mt-8"
                         style={{ background: colors[1] }}
