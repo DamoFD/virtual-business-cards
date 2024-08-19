@@ -1,8 +1,10 @@
 package card
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -44,6 +46,8 @@ func (h *Handler) RegisterRoutes(router *mux.Router, middleware types.Middleware
 	// Protected routes
 	authRouter.Handle("/cards/@me", http.HandlerFunc(h.handleGetMyCards)).Methods("GET")
 	authRouter.Handle("/cards", http.HandlerFunc(h.handleCreateCard)).Methods("POST")
+	authRouter.Handle("/cards/{id}", http.HandlerFunc(h.handleUpdateCard)).Methods("PUT")
+	authRouter.Handle("/cards/{id}", http.HandlerFunc(h.handleDeleteCard)).Methods("DELETE")
 }
 
 func (h *Handler) handleGetCard(w http.ResponseWriter, r *http.Request) {
@@ -140,6 +144,129 @@ func (h *Handler) handleCreateCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create the associated CardItemFields
+	for _, field := range payload.CardItems {
+		cardItemField := types.CardItemField{
+			CardID:     card.ID,
+			CardItemID: field.CardItemID,
+			Name:       field.Name,
+			Value:      field.Value,
+		}
+
+		if err := h.store.CreateCardItemField(r.Context(), cardItemField); err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to create card item field: %v", err))
+			return
+		}
+	}
+
 	// Return a success response
 	utils.WriteJSON(w, http.StatusCreated, card)
+}
+
+func (h *Handler) handleUpdateCard(w http.ResponseWriter, r *http.Request) {
+
+	// Extract the card ID from the URL
+	vars := mux.Vars(r)
+	cardIDStr := vars["id"]
+	cardID, err := strconv.Atoi(cardIDStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid card ID"))
+		return
+	}
+
+	// get JSON payload
+	var payload types.CardPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// validate the payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	// check if the slug is used
+	existingCard, err := h.store.GetCardBySlugExcludingID(payload.Slug, cardID)
+	if err != nil && err != sql.ErrNoRows {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to check slug availability: %v", err))
+		return
+	}
+
+	if existingCard != nil {
+		utils.WriteError(w, http.StatusConflict, fmt.Errorf("Slug is taken"))
+		return
+	}
+
+	// Retrieve the user ID from the Redis session
+	sessionID, err := r.Cookie("session_id")
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("session not found"))
+		return
+	}
+
+	sessionData, err := h.auth.GetSession(r.Context(), sessionID.Value)
+	if err != nil || sessionData.UserID == 0 {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("session not found"))
+		return
+	}
+
+	// Update the card
+	card, err := h.store.UpdateCard(r.Context(), types.Card{
+		Name:   payload.Name,
+		Slug:   payload.Slug,
+		UserID: sessionData.UserID,
+	}, cardID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Delete the associated CardItemFields
+	if err := h.store.DeleteCardItemFieldsByCardID(r.Context(), card.ID); err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to delete card item fields: %v", err))
+		return
+	}
+
+	// Create the associated CardItemFields
+	for _, field := range payload.CardItems {
+		cardItemField := types.CardItemField{
+			CardID:     card.ID,
+			CardItemID: field.CardItemID,
+			Name:       field.Name,
+			Value:      field.Value,
+		}
+
+		if err := h.store.CreateCardItemField(r.Context(), cardItemField); err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to create card item field: %v", err))
+			return
+		}
+	}
+
+	// Return a success response
+	utils.WriteJSON(w, http.StatusCreated, card)
+}
+
+func (h *Handler) handleDeleteCard(w http.ResponseWriter, r *http.Request) {
+
+	// Extract the card ID from the URL
+	vars := mux.Vars(r)
+	cardIDStr := vars["id"]
+	cardID, err := strconv.Atoi(cardIDStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid card ID"))
+		return
+	}
+
+	// Delete the card
+	err = h.store.DeleteCard(r.Context(), cardID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Return a success response
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "card deleted"})
 }
