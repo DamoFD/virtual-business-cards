@@ -1,12 +1,32 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { CardContext } from '../context/CardContext';
 import GetColors from '../colors/GetColors';
 import Stepper from '../editor/components/Stepper';
 import Input from '../editor/components/Input';
+import axiosClient from '../axios-client';
 
 const Register = () => {
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('') 
+    const [confirmPassword, setConfirmPassword] = useState('')
+
     const { card } = useContext(CardContext)
     const colors = GetColors(card.colors['Colors'])
+
+    const handleRegister = async () => {
+        try {
+            const response = await axiosClient.post('register', {
+                'name': name,
+                'email': email,
+                'password': password,
+                'confirm_password': confirmPassword
+            });
+            console.log('Register Successful', response.data);
+        } catch (error) {
+            console.error('login failed', error.response.data);
+        }
+    }
 
     return (
         <div className="w-full bg-brand-background flex flex-col items-center">
@@ -16,11 +36,14 @@ const Register = () => {
                 <p className="text-brand-black font-hanken text-lg">Time to bring your card to life! Create an account to save your changes and share it with others.</p>
 
                 <div>
-                    <Input label="Email" value="" onChange="" autoFocus={true} />
-                    <Input label="Password" value="" onChange="" />
+                    <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} autoFocus={true} />
+                    <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input label="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <Input label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                     <button
                         className="card-depth px-4 py-2 font-hanken mt-8"
                         style={{ background: colors[1] }}
+                        onClick={handleRegister}
                     >Continue</button>
                 </div>
 
