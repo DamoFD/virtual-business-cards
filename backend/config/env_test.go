@@ -108,3 +108,52 @@ func TestInitConfigWithDefaults(t *testing.T) {
 		t.Errorf("initConfig().DBSSLMode = %q, want %q", config.DBSSLMode, "disable")
 	}
 }
+
+func TestGetEnvAsInt(t *testing.T) {
+	t.Run("environment variable is set to valid integer", func(t *testing.T) {
+		os.Setenv("JWT_EXPIRATION_IN_SECONDS", "3600")
+		defer os.Unsetenv("JWT_EXPIRATION_IN_SECONDS")
+
+		value := getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 0)
+		if value != 3600 {
+			t.Errorf("getEnvAsInt() = %d, want %d", value, 3600)
+		}
+	})
+
+	t.Run("environment variable is not set", func(t *testing.T) {
+		value := getEnvAsInt("NON_EXISTANT_VAR", 7200)
+		if value != 7200 {
+			t.Errorf("getEnvAsInt() = %d, want %d", value, 7200)
+		}
+	})
+
+	t.Run("environment variable is set to non-integer value", func(t *testing.T) {
+		os.Setenv("JWT_EXPIRATION_IN_SECONDS", "not_an_int")
+		defer os.Unsetenv("JWT_EXPIRATION_IN_SECONDS")
+
+		value := getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 7200)
+		if value != 7200 {
+			t.Errorf("getEnvAsInt() = %d, want %d", value, 7200)
+		}
+	})
+
+	t.Run("environment variable set to negative integer", func(t *testing.T) {
+		os.Setenv("JWT_EXPIRATION_IN_SECONDS", "-3600")
+		defer os.Unsetenv("JWT_EXPIRATION_IN_SECONDS")
+
+		value := getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 7200)
+		if value != -3600 {
+			t.Errorf("getEnvAsInt() = %d, want %d", value, -3600)
+		}
+	})
+
+	t.Run("environment variable set to zero", func(t *testing.T) {
+		os.Setenv("JWT_EXPIRATION_IN_SECONDS", "0")
+		defer os.Unsetenv("JWT_EXPIRATION_IN_SECONDS")
+
+		value := getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 7200)
+		if value != 0 {
+			t.Errorf("getEnvAsInt() = %d, want %d", value, 0)
+		}
+	})
+}
