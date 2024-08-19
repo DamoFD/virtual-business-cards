@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CardContext } from '../context/CardContext';
 import { useAuth } from '../context/AuthContext';
 import GetColors from '../colors/GetColors';
@@ -38,7 +38,6 @@ const Login = () => {
             // redirect to Dashboard
             navigate('/dashboard');
         } catch (error) {
-            console.error(error);
             //setError(error.response.data.error);
             if (error.name === 'ValidationError') {
                 const validationErrors = {};
@@ -65,17 +64,20 @@ const Login = () => {
 
                 <div>
 
-                    <Input label="Email" value={email} onChange={(e) => setEmail(e.target.value)} color={errors.email ? 'red-500' : null} />
+                    <Input autoFocus={true} label="Email" value={email} onChange={(e) => setEmail(e.target.value)} color={errors.email ? 'red-500' : null} />
                     {errors.email && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.email}</p>}
 
                     <Input label="Password" value={password} onChange={(e) => setPassword(e.target.value)} color={errors.password ? 'red-500' : null} />
                     {errors.password && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.password}</p>}
 
-                    <button
-                        className="card-depth px-4 py-2 font-hanken mt-8"
-                        style={{ background: colors[1] }}
-                        onClick={handleLogin}
-                    >Continue</button>
+                    <div className="flex items-center justify-between mt-8">
+                        <button
+                            className="card-depth px-4 py-2 font-hanken"
+                            style={{ background: colors[1] }}
+                            onClick={handleLogin}
+                        >Continue</button>
+                        <p className="text-brand-black font-hanken">Need an account? <Link to="/register" className="text-green-600 underline">Sign up</Link></p>
+                    </div>
                 </div>
 
                 <div className="flex items-center w-full justify-center space-x-4 mt-10">

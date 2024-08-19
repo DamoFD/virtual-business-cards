@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CardContext } from '../context/CardContext';
 import { useAuth } from '../context/AuthContext';
 import GetColors from '../colors/GetColors';
@@ -79,11 +79,15 @@ const Register = () => {
 
                     <Input label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} color={errors.confirmPassword ? 'red-500' : null} />
                     {errors.confirmPassword && <p className="text-red-500 text-lg font-semibold font-hanken">{errors.confirmPassword}</p>}
-                    <button
-                        className="card-depth px-4 py-2 font-hanken mt-8"
-                        style={{ background: colors[1] }}
-                        onClick={handleRegister}
-                    >Continue</button>
+
+                    <div className="flex items-center justify-between mt-8">
+                        <button
+                            className="card-depth px-4 py-2 font-hanken"
+                            style={{ background: colors[1] }}
+                            onClick={handleRegister}
+                        >Continue</button>
+                        <p className="font-hanken text-brand-black">Have an account? <Link to="/login" className="text-green-600 underline">Login</Link></p>
+                    </div>
                 </div>
 
                 <div className="flex items-center w-full justify-center space-x-4 mt-10">
