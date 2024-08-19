@@ -46,9 +46,10 @@ type UserStore interface {
 }
 
 type CardStore interface {
-	GetCardBySlug(slug string) (*Card, error)
+	GetCardBySlug(slug string) (*CardResponse, error)
 	GetCardsByUserID(userID int) ([]*Card, error)
 	CreateCard(ctx context.Context, card Card) (Card, error)
+	CreateCardItemField(ctx context.Context, f CardItemField) error
 	UpdateCard(ctx context.Context, card Card) (Card, error)
 	DeleteCard(ctx context.Context, cardID int) error
 }
@@ -72,9 +73,36 @@ type Card struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type CardResponse struct {
+	ID        int             `json:"id"`
+	Name      string          `json:"name"`
+	Slug      string          `json:"slug"`
+	UserID    int             `json:"user_id"`
+	CreatedAt string          `json:"created_at"`
+	UpdatedAt string          `json:"updated_at"`
+	CardItems []FieldResponse `json:"fields"`
+}
+
+type FieldResponse struct {
+	ID         int    `json:"id"`
+	CardID     int    `json:"card_id"`
+	CardItemID int    `json:"card_item_id"`
+	Name       string `json:"name"`
+	Value      string `json:"value"`
+	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
+}
+
 type CardPayload struct {
-	Name string `json:"name" validate:"required,min=2,max=100"`
-	Slug string `json:"slug" validate:"required,min=2,max=100,slug"`
+	Name      string         `json:"name" validate:"required,min=2,max=100"`
+	Slug      string         `json:"slug" validate:"required,min=2,max=100,slug"`
+	CardItems []FieldPayload `json:"fields" validate:"required,dive"`
+}
+
+type FieldPayload struct {
+	CardItemID int    `json:"card_item_id" validate:"required,gt=0"`
+	Name       string `json:"name" validate:"required,min=2,max=100"`
+	Value      string `json:"value" validate:"required,min=2,max=100"`
 }
 
 type CardItem struct {

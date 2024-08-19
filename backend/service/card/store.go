@@ -54,7 +54,7 @@ func scanRowIntoCard(row *sql.Row) (*types.Card, error) {
 	return c, nil
 }
 
-func (s *Store) GetCardBySlug(slug string) (*types.Card, error) {
+func (s *Store) GetCardBySlug(slug string) (*types.CardResponse, error) {
 	row := s.db.QueryRow("SELECT * FROM cards WHERE slug = $1", slug)
 
 	c, err := scanRowIntoCard(row)
@@ -63,7 +63,41 @@ func (s *Store) GetCardBySlug(slug string) (*types.Card, error) {
 		return nil, err
 	}
 
-	return c, nil
+	rows, err := s.db.Query("SELECT id, card_id, card_item_id, name, value, created_at, updated_at FROM fields WHERE card_id = $1", c.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var fields []types.FieldResponse
+	for rows.Next() {
+		var field types.FieldResponse
+		if err := rows.Scan(
+			&field.ID,
+			&field.CardID,
+			&field.CardItemID,
+			&field.Name,
+			&field.Value,
+			&field.CreatedAt,
+			&field.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		fields = append(fields, field)
+	}
+
+	// Build the CardResponse
+	cardResponse := &types.CardResponse{
+		ID:        c.ID,
+		Name:      c.Name,
+		Slug:      c.Slug,
+		UserID:    c.UserID,
+		CreatedAt: c.CreatedAt,
+		UpdatedAt: c.UpdatedAt,
+		CardItems: fields,
+	}
+
+	return cardResponse, nil
 }
 
 func (s *Store) GetCardsByUserID(userID int) ([]*types.Card, error) {
@@ -110,5 +144,16 @@ func (s *Store) UpdateCard(ctx context.Context, card types.Card) (types.Card, er
 	return types.Card{}, nil
 }
 func (s *Store) DeleteCard(ctx context.Context, cardID int) error {
+	return nil
+}
+
+func (s *Store) CreateCardItemField(ctx context.Context, f types.CardItemField) error {
+	query := "INSERT INTO fields(card_id, card_item_id, name, value) VALUES ($1, $2, $3, $4)"
+
+	_, err := s.db.ExecContext(ctx, query, f.CardID, f.CardItemID, f.Name, f.Value)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

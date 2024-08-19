@@ -140,6 +140,21 @@ func (h *Handler) handleCreateCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create the associated CardItemFields
+	for _, field := range payload.CardItems {
+		cardItemField := types.CardItemField{
+			CardID:     card.ID,
+			CardItemID: field.CardItemID,
+			Name:       field.Name,
+			Value:      field.Value,
+		}
+
+		if err := h.store.CreateCardItemField(r.Context(), cardItemField); err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("failed to create card item field: %v", err))
+			return
+		}
+	}
+
 	// Return a success response
 	utils.WriteJSON(w, http.StatusCreated, card)
 }
