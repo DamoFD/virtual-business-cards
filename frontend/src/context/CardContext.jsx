@@ -6,6 +6,11 @@ export const CardContext = createContext();
 export const CardProvider = ({ children }) => {
 
     const initializeCardState = () => {
+        const savedCard = localStorage.getItem('card');
+        if (savedCard) {
+            return JSON.parse(savedCard);
+        }
+
         const initialState = {
             images: {
                 'Cover Photo': null,
@@ -32,22 +37,19 @@ export const CardProvider = ({ children }) => {
 
     const updateField = (name, fieldName, value) => {
         setCard(prevCard => {
-                if (prevCard[name]) {
-                    return {
-                        ...prevCard,
-                        [name]: {
-                            ...prevCard[name],
-                            [fieldName]: value,
-                        }
-                    }
-                } else {
-                    return {
-                    ...prevCard,
-                    [name]: value,
-                };
-            }
-        })
-    }
+            const updatedCard = {
+                ...prevCard,
+                [name]: prevCard[name]
+                    ? {
+                          ...prevCard[name],
+                          [fieldName]: value,
+                      }
+                    : value,
+            };
+            localStorage.setItem('card', JSON.stringify(updatedCard)); // Save the updated card state to localStorage
+            return updatedCard;
+        });
+    };
 
     return (
         <CardContext.Provider value={{ card, updateField, jsonData }}>
